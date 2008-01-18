@@ -89,12 +89,15 @@ class CLIComms(object):
 			for item in response:
 				splititem=urllib.unquote(item).split(":")
 				if splititem[0]=="id":
-					gotalbums=gotalbums+1
-					if gotalbums==numalbums:
-						break;
 
 					if thisalbum!=None:
 						albums.append(thisalbum)
+
+						thisalbum=None
+						gotalbums=gotalbums+1
+						
+						if gotalbums==numalbums:
+							break;
 
 					thisalbum=Album.Album()
 					thisalbum.setid(splititem[1])
@@ -129,6 +132,12 @@ class CLIComms(object):
 
 			if thisalbum!=None:
 				albums.append(thisalbum)
+
+				thisalbum=None
+				gotalbums=gotalbums+1
+
+				if gotalbums==numalbums:
+					break;
 
 		print
 
