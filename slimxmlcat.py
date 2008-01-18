@@ -7,7 +7,11 @@ import xml.dom
 
 import SqueezeCenter.CLI.CLIComms
 
-slim=SqueezeCenter.CLI.CLIComms.CLIComms("cube.gentlyhosting.co.uk",9001)
+host="cube.gentlyhosting.co.uk"
+cliport=9001
+webport=9000
+
+slim=SqueezeCenter.CLI.CLIComms.CLIComms(host,cliport)
 
 try:
 	albums=slim.albums(10)
@@ -46,7 +50,7 @@ try:
 		xmlalbum.appendChild(year)
 		
 		artwork=doc.createElement("artwork")
-		artworkval=doc.createTextNode(str(album.artwork()))
+		artworkval=doc.createTextNode("http://" + host + ":" + str(webport) + "/music/" + str(album.artwork()) + "/cover.jpg")
 		artwork.appendChild(artworkval)
 		xmlalbum.appendChild(artwork)
 
@@ -60,8 +64,8 @@ try:
 		disccount.appendChild(disccountval)
 		xmlalbum.appendChild(disccount)
 
-		compilation=doc.createElement("artwork")
-		compilationval=doc.createTextNode(str(album.artwork()))
+		compilation=doc.createElement("compilation")
+		compilationval=doc.createTextNode(str(album.compilation()))
 		compilation.appendChild(compilationval)
 		xmlalbum.appendChild(compilation)
 
@@ -101,7 +105,7 @@ try:
 
 
 	fp = codecs.open("file.xml","w","UTF-8")
-	doc.writexml(fp,"  ","  ","\n","UTF-8")
+	doc.writexml(fp,"","","","UTF-8")
 	#print doc.toxml("UTF-8")
 		
 
