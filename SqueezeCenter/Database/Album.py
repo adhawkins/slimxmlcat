@@ -13,11 +13,11 @@ class Album(object):
 	def setid(self,id):
 		self.__id=id
 		
-	def setyear(self,year):
-		self.__year=year
-		
 	def setname(self,newname):
 		self.__name=newname
+		
+	def setyear(self,year):
+		self.__year=int(year)
 		
 	def setartwork(self,artwork):
 		self.__artwork=artwork
@@ -46,11 +46,20 @@ class Album(object):
 	def year(self):
 		return self.__year
 		
-	def artist(self):
-		return self.__artist
-		
 	def artwork(self):
 		return self.__artwork
+
+	def disc(self):
+		return self.__disc
+		
+	def disccount(self):
+		return self.__disccount
+		
+	def compilation(self):
+		return self.__compilation
+		
+	def artist(self):
+		return self.__artist
 		
 	def tracks(self):
 		return self.__tracks

@@ -10,7 +10,7 @@ import SqueezeCenter.CLI.CLIComms
 slim=SqueezeCenter.CLI.CLIComms.CLIComms("cube.gentlyhosting.co.uk",9001)
 
 try:
-	albums=slim.albums(4)
+	albums=slim.albums(10)
 	
 	print "Found " + str(len(albums)) + " albums"
 
@@ -45,16 +45,31 @@ try:
 		year.appendChild(yearval)
 		xmlalbum.appendChild(year)
 		
-		artist=doc.createElement("artist")
-		artistval=doc.createTextNode(album.artist())
-		artist.appendChild(artistval)
-		xmlalbum.appendChild(artist)
-		
 		artwork=doc.createElement("artwork")
 		artworkval=doc.createTextNode(str(album.artwork()))
 		artwork.appendChild(artworkval)
 		xmlalbum.appendChild(artwork)
 
+		disc=doc.createElement("disc")
+		discval=doc.createTextNode(str(album.disc()))
+		disc.appendChild(discval)
+		xmlalbum.appendChild(disc)
+
+		disccount=doc.createElement("disccount")
+		disccountval=doc.createTextNode(str(album.disccount()))
+		disccount.appendChild(disccountval)
+		xmlalbum.appendChild(disccount)
+
+		compilation=doc.createElement("artwork")
+		compilationval=doc.createTextNode(str(album.artwork()))
+		compilation.appendChild(compilationval)
+		xmlalbum.appendChild(compilation)
+
+		artist=doc.createElement("artist")
+		artistval=doc.createTextNode(album.artist())
+		artist.appendChild(artistval)
+		xmlalbum.appendChild(artist)
+		
 		xmltracks=doc.createElement("tracks")
 		
 		tracks=album.tracks()
