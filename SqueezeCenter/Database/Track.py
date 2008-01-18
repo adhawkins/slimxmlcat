@@ -16,7 +16,7 @@ class Track(object):
 		self.__tracknum=int(tracknum)
 		
 	def setduration(self,duration):
-		self.__duration=duration
+		self.__duration=int(float(duration))
 		
 	def setartist(self,artist):
 		self.__artist=artist
