@@ -2,6 +2,7 @@
 
 import sys
 import time
+import codecs
 import xml.dom
 
 import SqueezeCenter.CLI.CLIComms
@@ -9,7 +10,7 @@ import SqueezeCenter.CLI.CLIComms
 slim=SqueezeCenter.CLI.CLIComms.CLIComms("cube.gentlyhosting.co.uk",9001)
 
 try:
-	albums=slim.albums(40)
+	albums=slim.albums(4)
 	
 	print "Found " + str(len(albums)) + " albums"
 
@@ -38,9 +39,9 @@ try:
 		nameval=doc.createTextNode(album.name())
 		name.appendChild(nameval)
 		xmlalbum.appendChild(name)
-		
+
 		year=doc.createElement("year")
-		yearval=doc.createTextNode(album.year())
+		yearval=doc.createTextNode(str(album.year()))
 		year.appendChild(yearval)
 		xmlalbum.appendChild(year)
 		
@@ -84,8 +85,9 @@ try:
 		docelement.appendChild(xmlalbum)
 
 
-	fp = open("file.xml","w")
+	fp = codecs.open("file.xml","w","UTF-8")
 	doc.writexml(fp,"  ","  ","\n","UTF-8")
+	#print doc.toxml("UTF-8")
 		
 
 except SqueezeCenter.CLI.CLIComms.CLICommsException, inst:

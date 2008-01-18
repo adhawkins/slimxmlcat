@@ -27,11 +27,15 @@ class CLIComms(object):
 		data = ""
 		self.s.send(cmd + '\n')
 
+#		print "Sent: " + cmd
+		
 		while (data.find("\n")==-1):
 			data = data + self.s.recv(8192)
 
 		if data.split()[0]!=cmd.split()[0]:
 			raise CLICommsException("Unexpected response: Expected " + cmd.split()[0] + ", received " + data.split()[0])
+
+#		print "Received: " + data
 		
 		return data.split()
   
@@ -51,13 +55,13 @@ class CLIComms(object):
 				thistrack=Track.Track()
 				thistrack.setid(splititem[1])
 			elif splititem[0]=="title":
-				thistrack.settitle(splititem[1])
+				thistrack.settitle(unicode(splititem[1],"utf-8"))
 			elif splititem[0]=="tracknum":
 				thistrack.settracknum(splititem[1])
 			elif splititem[0]=="duration":
 				thistrack.setduration(splititem[1])
 			elif splititem[0]=="artist":
-				thistrack.setartist(splititem[1])
+				thistrack.setartist(unicode(splititem[1],"utf-8"))
 			elif splititem[0]=="rescan":
 				raise CLICommsException("scan in progress - aborting")
 
@@ -85,13 +89,16 @@ class CLIComms(object):
 			for item in response:
 				splititem=urllib.unquote(item).split(":")
 				if splititem[0]=="id":
+					gotalbums=gotalbums+1
+					if gotalbums==numalbums:
+						break;
+
 					if thisalbum!=None:
 						albums.append(thisalbum)
 
 					thisalbum=Album.Album()
 					thisalbum.setid(splititem[1])
-					gotalbums=gotalbums+1
-
+					
 					numdots=int(float(gotalbums)/float(numalbums)*40.0)
 					
 					if numdots!=lastdots:
@@ -104,7 +111,7 @@ class CLIComms(object):
 					tracks=self.tracks(splititem[1])
 					thisalbum.settracks(tracks)
 				elif splititem[0]=="album":
-					thisalbum.setname(splititem[1])
+					thisalbum.setname(unicode(splititem[1],"utf-8"))
 				elif splititem[0]=="year":
 					thisalbum.setyear(splititem[1])
 				elif splititem[0]=="artwork_track_id":
@@ -116,7 +123,7 @@ class CLIComms(object):
 				elif splititem[0]=="compilation":
 					thisalbum.setcompilation(splititem[1])
 				elif splititem[0]=="artist":
-					thisalbum.setartist(splititem[1])
+					thisalbum.setartist(unicode(splititem[1],"utf-8"))
 				elif splititem[0]=="rescan":
 					raise CLICommsException("scan in progress - aborting")
 
