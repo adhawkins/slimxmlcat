@@ -3,18 +3,26 @@
 import sys
 import time
 import codecs
+import optparse
 import xml.dom
 
 import SqueezeCenter.CLI.CLIComms
 
-host="cube.gentlyhosting.co.uk"
-cliport=9001
-webport=9000
+parser = optparse.OptionParser()
 
-slim=SqueezeCenter.CLI.CLIComms.CLIComms(host,cliport)
+parser.add_option("-s","--server",dest="server",help="SqueezeCenter host name or IP address",metavar="HOST",action="store",type="string",default="localhost")
+parser.add_option("-c","--cliport",dest="cliport",help="SqueezeCenter CLI port",metavar="PORT",action="store",type="int",default=9001)
+parser.add_option("-w","--httpport",dest="httpport",help="SqueezeCenter http port",metavar="PORT",action="store",type="int",default=9000)
+parser.add_option("-l","--limit",dest="limit",help="Album limit",metavar="LIMIT",action="store",type="int",default=0)
+parser.add_option("-f","--file",dest="file",help="Output file name",metavar="FILE",action="store",type="string")
+parser.add_option("-x","--xslt",dest="xsltfile",help="XSLT file name",metavar="FILE",action="store",type="string")
+
+(options,args) = parser.parse_args()
+
+slim=SqueezeCenter.CLI.CLIComms.CLIComms(options.server,int(options.cliport))
 
 try:
-	albums=slim.albums(10)
+	albums=slim.albums(options.limit)
 	
 	print "Found " + str(len(albums)) + " albums"
 
@@ -50,7 +58,7 @@ try:
 		xmlalbum.appendChild(year)
 		
 		artwork=doc.createElement("artwork")
-		artworkval=doc.createTextNode("http://" + host + ":" + str(webport) + "/music/" + str(album.artwork()) + "/cover.jpg")
+		artworkval=doc.createTextNode("http://" + options.server + ":" + str(options.httpport) + "/music/" + str(album.artwork()) + "/cover.jpg")
 		artwork.appendChild(artworkval)
 		xmlalbum.appendChild(artwork)
 
@@ -104,9 +112,9 @@ try:
 		docelement.appendChild(xmlalbum)
 
 
-	fp = codecs.open("file.xml","w","UTF-8")
+	fp = codecs.open(str(options.file),"w","UTF-8")
+	fp.write("<?xml-stylesheet type=\"text/xsl\" href=\"" + str(options.xsltfile) + "\"?>")
 	doc.writexml(fp,"","","","UTF-8")
-	#print doc.toxml("UTF-8")
 		
 
 except SqueezeCenter.CLI.CLIComms.CLICommsException, inst:
