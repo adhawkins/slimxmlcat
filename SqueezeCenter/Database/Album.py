@@ -3,7 +3,7 @@ class Album(object):
 		self.__id=0
 		self.__name=""
 		self.__year=0
-		self.__artwork=""
+		self.__artwork=0
 		self.__disc=0
 		self.__disccount=0
 		self.__compilation=0
@@ -20,7 +20,7 @@ class Album(object):
 		self.__year=int(year)
 		
 	def setartwork(self,artwork):
-		self.__artwork=artwork
+		self.__artwork=int(artwork)
 		
 	def setdisc(self,disc):
 		self.__disc=disc
