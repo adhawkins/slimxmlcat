@@ -19,108 +19,111 @@ parser.add_option("-x","--xslt",dest="xsltfile",help="XSLT file name",metavar="F
 
 (options,args) = parser.parse_args()
 
-slim=SqueezeCenter.CLI.CLIComms.CLIComms(options.server,int(options.cliport))
+if options.file==None:
+	print "No output file specified"
+else:
+	slim=SqueezeCenter.CLI.CLIComms.CLIComms(options.server,int(options.cliport))
 
-try:
-	albums=slim.albums(options.limit)
-	
-	print "Found " + str(len(albums)) + " albums"
+	try:
+		albums=slim.albums(options.limit)
 
-	doc=xml.dom.getDOMImplementation().createDocument("","catalogue",None)
-	docelement=doc._get_documentElement()
+		print "Found " + str(len(albums)) + " albums"
 
-	numdots=0
-	lastdots=0
-	processedalbums=0
-	
-	for album in albums:
-		processedalbums=processedalbums+1
+		doc=xml.dom.getDOMImplementation().createDocument("","catalogue",None)
+		docelement=doc._get_documentElement()
 
-		numdots=int(float(processedalbums)/float(len(albums))*40.0)
-		if numdots!=lastdots:
-			for dot in range(lastdots,numdots):
-				print ".",
+		numdots=0
+		lastdots=0
+		processedalbums=0
 
-		sys.stdout.flush()
-		lastdots=numdots
-		
-		xmlalbum=doc.createElement("album");
-		xmlalbum.setAttribute("id",album.id())
-		
-		name=doc.createElement("name")
-		nameval=doc.createTextNode(album.name())
-		name.appendChild(nameval)
-		xmlalbum.appendChild(name)
+		for album in albums:
+			processedalbums=processedalbums+1
 
-		year=doc.createElement("year")
-		yearval=doc.createTextNode(str(album.year()))
-		year.appendChild(yearval)
-		xmlalbum.appendChild(year)
-		
-		artwork=doc.createElement("artwork")
-		artworkval=doc.createTextNode("http://" + options.server + ":" + str(options.httpport) + "/music/" + str(album.artwork()) + "/cover.jpg")
-		artwork.appendChild(artworkval)
-		xmlalbum.appendChild(artwork)
+			numdots=int(float(processedalbums)/float(len(albums))*40.0)
+			if numdots!=lastdots:
+				for dot in range(lastdots,numdots):
+					print ".",
 
-		disc=doc.createElement("disc")
-		discval=doc.createTextNode(str(album.disc()))
-		disc.appendChild(discval)
-		xmlalbum.appendChild(disc)
+			sys.stdout.flush()
+			lastdots=numdots
 
-		disccount=doc.createElement("disccount")
-		disccountval=doc.createTextNode(str(album.disccount()))
-		disccount.appendChild(disccountval)
-		xmlalbum.appendChild(disccount)
+			xmlalbum=doc.createElement("album");
+			xmlalbum.setAttribute("id",album.id())
 
-		compilation=doc.createElement("compilation")
-		compilationval=doc.createTextNode(str(album.compilation()))
-		compilation.appendChild(compilationval)
-		xmlalbum.appendChild(compilation)
+			name=doc.createElement("name")
+			nameval=doc.createTextNode(album.name())
+			name.appendChild(nameval)
+			xmlalbum.appendChild(name)
 
-		artist=doc.createElement("artist")
-		artistval=doc.createTextNode(album.artist())
-		artist.appendChild(artistval)
-		xmlalbum.appendChild(artist)
-		
-		xmltracks=doc.createElement("tracks")
-		
-		tracks=album.tracks()
+			year=doc.createElement("year")
+			yearval=doc.createTextNode(str(album.year()))
+			year.appendChild(yearval)
+			xmlalbum.appendChild(year)
 
-		for track in tracks:
-			xmltrack=doc.createElement("track")
-			xmltrack.setAttribute("number",str(track.tracknum()))
-			
-			title=doc.createElement("title")
-			titleval=doc.createTextNode(track.title())
-			title.appendChild(titleval)
-			xmltrack.appendChild(title)
-			
-			duration=doc.createElement("duration")
-			durationval=doc.createTextNode(str(track.duration()))
-			duration.appendChild(durationval)
-			xmltrack.appendChild(duration)
-			
+			artwork=doc.createElement("artwork")
+			artworkval=doc.createTextNode("http://" + options.server + ":" + str(options.httpport) + "/music/" + str(album.artwork()) + "/cover.jpg")
+			artwork.appendChild(artworkval)
+			xmlalbum.appendChild(artwork)
+
+			disc=doc.createElement("disc")
+			discval=doc.createTextNode(str(album.disc()))
+			disc.appendChild(discval)
+			xmlalbum.appendChild(disc)
+
+			disccount=doc.createElement("disccount")
+			disccountval=doc.createTextNode(str(album.disccount()))
+			disccount.appendChild(disccountval)
+			xmlalbum.appendChild(disccount)
+
+			compilation=doc.createElement("compilation")
+			compilationval=doc.createTextNode(str(album.compilation()))
+			compilation.appendChild(compilationval)
+			xmlalbum.appendChild(compilation)
+
 			artist=doc.createElement("artist")
-			artistval=doc.createTextNode(track.artist())
+			artistval=doc.createTextNode(album.artist())
 			artist.appendChild(artistval)
-			xmltrack.appendChild(artist)
-			
-			xmltracks.appendChild(xmltrack)
-			
-		xmlalbum.appendChild(xmltracks)
+			xmlalbum.appendChild(artist)
 
-		docelement.appendChild(xmlalbum)
+			xmltracks=doc.createElement("tracks")
+
+			tracks=album.tracks()
+
+			for track in tracks:
+				xmltrack=doc.createElement("track")
+				xmltrack.setAttribute("number",str(track.tracknum()))
+
+				title=doc.createElement("title")
+				titleval=doc.createTextNode(track.title())
+				title.appendChild(titleval)
+				xmltrack.appendChild(title)
+
+				duration=doc.createElement("duration")
+				durationval=doc.createTextNode(str(track.duration()))
+				duration.appendChild(durationval)
+				xmltrack.appendChild(duration)
+
+				artist=doc.createElement("artist")
+				artistval=doc.createTextNode(track.artist())
+				artist.appendChild(artistval)
+				xmltrack.appendChild(artist)
+
+				xmltracks.appendChild(xmltrack)
+
+			xmlalbum.appendChild(xmltracks)
+
+			docelement.appendChild(xmlalbum)
 
 
-	fp = codecs.open(str(options.file),"w","UTF-8")
+		fp = codecs.open(str(options.file),"w","UTF-8")
 
-	if options.xsltfile!=None:
-		fp.write("<?xml-stylesheet type=\"text/xsl\" href=\"" + str(options.xsltfile) + "\"?>")
+		if options.xsltfile!=None:
+			fp.write("<?xml-stylesheet type=\"text/xsl\" href=\"" + str(options.xsltfile) + "\"?>")
 
-	doc.writexml(fp,"","","","UTF-8")
-		
+		doc.writexml(fp,"","","","UTF-8")
 
-except SqueezeCenter.CLI.CLIComms.CLICommsException, inst:
-	print "Exception: " + inst.message()
-	
-  
+
+	except SqueezeCenter.CLI.CLIComms.CLICommsException, inst:
+		print "Exception: " + inst.message()
+
+
