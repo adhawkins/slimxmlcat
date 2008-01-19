@@ -8,12 +8,12 @@ import xml.dom
 
 import SqueezeCenter.CLI.CLIComms
 
-parser = optparse.OptionParser()
+parser = optparse.OptionParser(version="%prog 1.0alpha",description="Retrieve album information from SqueezeCenter and generate an XML file for processing via XSLT")
 
 parser.add_option("-s","--server",dest="server",help="SqueezeCenter host name or IP address",metavar="HOST",action="store",type="string",default="localhost")
 parser.add_option("-c","--cliport",dest="cliport",help="SqueezeCenter CLI port",metavar="PORT",action="store",type="int",default=9001)
 parser.add_option("-w","--httpport",dest="httpport",help="SqueezeCenter http port",metavar="PORT",action="store",type="int",default=9000)
-parser.add_option("-l","--limit",dest="limit",help="Album limit",metavar="LIMIT",action="store",type="int",default=0)
+parser.add_option("-l","--limit",dest="limit",help="Album limit",metavar="LIMIT",action="store",type="int",default=-1)
 parser.add_option("-f","--file",dest="file",help="Output file name",metavar="FILE",action="store",type="string")
 parser.add_option("-x","--xslt",dest="xsltfile",help="XSLT file name",metavar="FILE",action="store",type="string")
 
@@ -113,7 +113,10 @@ try:
 
 
 	fp = codecs.open(str(options.file),"w","UTF-8")
-	fp.write("<?xml-stylesheet type=\"text/xsl\" href=\"" + str(options.xsltfile) + "\"?>")
+
+	if options.xsltfile!=None:
+		fp.write("<?xml-stylesheet type=\"text/xsl\" href=\"" + str(options.xsltfile) + "\"?>")
+
 	doc.writexml(fp,"","","","UTF-8")
 		
 
