@@ -108,6 +108,11 @@ else:
 				artist.appendChild(artistval)
 				xmltrack.appendChild(artist)
 
+				genre=doc.createElement("genre")
+				genreval=doc.createTextNode(track.genre())
+				genre.appendChild(genreval)
+				xmltrack.appendChild(genre)
+
 				xmltracks.appendChild(xmltrack)
 
 			xmlalbum.appendChild(xmltracks)

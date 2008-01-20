@@ -43,7 +43,7 @@ class CLIComms(object):
 		tracks=list()
 		thistrack=None
 
-		response=self.request("titles 0 100 album_id:" + album_id + " tags:adt")
+		response=self.request("titles 0 100 album_id:" + album_id + " tags:adtg")
 
 		for item in response:
 			splititem=urllib.unquote(item).split(":")
@@ -62,6 +62,8 @@ class CLIComms(object):
 				thistrack.setduration(splititem[1])
 			elif splititem[0]=="artist":
 				thistrack.setartist(unicode(splititem[1],"utf-8"))
+			elif splititem[0]=="genre":
+				thistrack.setgenre(unicode(splititem[1],"utf-8"))
 			elif splititem[0]=="rescan":
 				raise CLICommsException("scan in progress - aborting")
 
