@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+#http://adamv.com/dev/python/curses/
+
 import curses
 import time
 
@@ -9,10 +11,8 @@ try:
 	curses.noecho()
 	curses.cbreak()
 	
-	screen=stdscr.subwin(23,79,0,0)
-	screen.box()
-	screen.addstr(5,33,"Hello",curses.A_NORMAL)
-	screen.refresh()
+	stdscr.addstr(5,33,"Hello",curses.A_NORMAL)
+	stdscr.refresh()
 	
 	time.sleep(5)
 	
