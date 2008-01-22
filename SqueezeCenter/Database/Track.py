@@ -6,6 +6,7 @@ class Track(object):
 		self.__duration=0.0
 		self.__artist=""
 		self.__genre=""
+		self.__discnum=0
 
 	def setid(self,id):
 		self.__id=id
@@ -24,6 +25,9 @@ class Track(object):
 
 	def setgenre(self,genre):
 		self.__genre=genre
+	
+	def setdiscnum(self,discnum):
+		self.__discnum=int(discnum)
 		
 	def id(self):
 		return self.__id
@@ -42,3 +46,6 @@ class Track(object):
 
 	def genre(self):
 		return self.__genre
+		
+	def discnum(self):
+		return self.__discnum

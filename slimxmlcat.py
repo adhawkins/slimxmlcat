@@ -97,7 +97,10 @@ else:
 
 			for track in tracks:
 				xmltrack=doc.createElement("track")
-				xmltrack.setAttribute("number",str(track.tracknum()))
+				if track.discnum()!=0:
+					xmltrack.setAttribute("number",str(track.discnum()) + " - " + str(track.tracknum()))
+				else:
+					xmltrack.setAttribute("number",str(track.tracknum()))
 
 				title=doc.createElement("title")
 				titleval=doc.createTextNode(track.title())

@@ -5,6 +5,12 @@ import sys
 from SqueezeCenter.Database import Album
 from SqueezeCenter.Database import Track
 
+def tracksort(x,y):
+	if x.discnum()==y.discnum():
+		return x.tracknum()-y.tracknum()
+	else:
+		return x.discnum()-y.discnum()
+
 class CLICommsException(Exception):
 	def __init__(self,message):
 		self.__message=message
@@ -46,7 +52,7 @@ class CLIComms(object):
 		tracks=list()
 		thistrack=None
 
-		response=self.request("titles 0 100 album_id:" + album_id + " tags:adtg")
+		response=self.request("titles 0 100 album_id:" + album_id + " tags:adtgi")
 
 		for item in response:
 			splititem=urllib.unquote(item).split(":")
@@ -67,13 +73,15 @@ class CLIComms(object):
 				thistrack.setartist(unicode(splititem[1],"utf-8"))
 			elif splititem[0]=="genre":
 				thistrack.setgenre(unicode(splititem[1],"utf-8"))
+			elif splititem[0]=="disc":
+				thistrack.setdiscnum(splititem[1])
 			elif splititem[0]=="rescan":
 				raise CLICommsException("scan in progress - aborting")
 
 		if thistrack!=None:
 			tracks.append(thistrack)
 
-		tracks.sort(lambda x, y: x.tracknum()-y.tracknum())
+		tracks.sort(tracksort)
 		
 		return tracks
 
