@@ -8,6 +8,12 @@ import xml.dom
 
 import SqueezeCenter.CLI.CLIComms
 
+def progress(message):
+	print message
+	
+def callback(processed,total):
+	print "Processed " + str(processed) + " of " + str(total)
+	
 parser = optparse.OptionParser(version="%prog 1.0alpha",description="Retrieve album information from SqueezeCenter and generate an XML file for processing via XSLT")
 
 parser.add_option("-s","--server",dest="server",help="SqueezeCenter host name or IP address",metavar="HOST",action="store",type="string",default="localhost")
@@ -20,12 +26,12 @@ parser.add_option("-x","--xslt",dest="xsltfile",help="XSLT file name",metavar="F
 (options,args) = parser.parse_args()
 
 if options.file==None:
-	print "No output file specified"
+	parser.print_help()
 else:
-	slim=SqueezeCenter.CLI.CLIComms.CLIComms(options.server,int(options.cliport))
+	slim=SqueezeCenter.CLI.CLIComms.CLIComms(options.server,int(options.cliport),progress)
 
 	try:
-		albums=slim.albums(options.limit)
+		albums=slim.albums(options.limit,callback)
 
 		print "Found " + str(len(albums)) + " albums"
 

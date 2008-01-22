@@ -13,13 +13,20 @@ class CLICommsException(Exception):
 		return self.__message
 
 class CLIComms(object):
-	def __init__(self,host,port):
-		print "Connecting to " + host + ":" + str(port)
+	__message=None
+	def __init__(self,host,port,message=None):
+		self.__message=message
+		
+		if (self.__message!=None):
+			self.__message("Connecting to " + host + ":" + str(port))
+			
 		self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.s.connect( (host, port))
 
 	def __del__(self):
-		print "Disconnecting"
+		if (self.__message!=None):
+			self.__message("Disconnecting")
+			
 		self.s.send('exit\n')
 		self.s.close()
 
@@ -27,16 +34,12 @@ class CLIComms(object):
 		data = ""
 		self.s.send(cmd + '\n')
 
-#		print "Sent: " + cmd
-		
 		while (data.find("\n")==-1):
 			data = data + self.s.recv(8192)
 
 		if data.split()[0]!=cmd.split()[0]:
 			raise CLICommsException("Unexpected response: Expected " + cmd.split()[0] + ", received " + data.split()[0])
 
-#		print "Received: " + data
-		
 		return data.split()
   
 	def tracks(self,album_id):
@@ -74,7 +77,7 @@ class CLIComms(object):
 		
 		return tracks
 
-	def albums(self,limit=-1):
+	def albums(self,limit=-1,callback=None):
 		albums=list()
 		thisalbum=None
 
@@ -82,37 +85,28 @@ class CLIComms(object):
 		if limit!=-1 and limit<numalbums:
 			numalbums=limit
 
-		print "Loading " + str(numalbums) + " albums"
-		gotalbums=0
-		numdots=0
-		lastdots=0
-		while (gotalbums<numalbums):
-			response=self.request("albums " + str(gotalbums) + " 10 tags:lyjiqwa")
+		if (self.__message!=None):
+			self.__message("Loading " + str(numalbums) + " albums")
+			
+		while (len(albums)<numalbums):
+			response=self.request("albums " + str(len(albums)) + " 10 tags:lyjiqwa")
 			for item in response:
 				splititem=urllib.unquote(item).split(":")
 				if splititem[0]=="id":
 
 					if thisalbum!=None:
 						albums.append(thisalbum)
+						if callback!=None:
+							callback(len(albums),numalbums)
 
 						thisalbum=None
-						gotalbums=gotalbums+1
 						
-						if gotalbums==numalbums:
+						if len(albums)==numalbums:
 							break;
 
 					thisalbum=Album.Album()
 					thisalbum.setid(splititem[1])
 					
-					numdots=int(float(gotalbums)/float(numalbums)*40.0)
-					
-					if numdots!=lastdots:
-						for dot in range(lastdots,numdots):
-							print ".",
-							
-					sys.stdout.flush()
-					lastdots=numdots
-
 					tracks=self.tracks(splititem[1])
 					thisalbum.settracks(tracks)
 				elif splititem[0]=="album":
@@ -134,14 +128,13 @@ class CLIComms(object):
 
 			if thisalbum!=None:
 				albums.append(thisalbum)
+				if callback!=None:
+					callback(len(albums),numalbums)
 
 				thisalbum=None
-				gotalbums=gotalbums+1
 
-				if gotalbums==numalbums:
+				if len(albums)==numalbums:
 					break;
-
-		print
 
 		return albums
     
