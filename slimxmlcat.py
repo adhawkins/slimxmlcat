@@ -108,7 +108,7 @@ else:
 				xmltrack.appendChild(title)
 
 				duration=doc.createElement("duration")
-				durationval=doc.createTextNode(str(track.duration()))
+				durationval=doc.createTextNode(str(track.duration()/60) + ":" + str(track.duration()%60).zfill(2))
 				duration.appendChild(durationval)
 				xmltrack.appendChild(duration)
 
@@ -139,5 +139,3 @@ else:
 
 	except SqueezeCenter.CLI.CLIComms.CLICommsException, inst:
 		print "Exception: " + inst.message()
-
-
