@@ -14,7 +14,7 @@ def progress(message):
 def callback(processed,total):
 	print "Processed " + str(processed) + " of " + str(total)
 	
-parser = optparse.OptionParser(version="%prog 1.0alpha",description="Retrieve album information from SqueezeCenter and generate an XML file for processing via XSLT")
+parser = optparse.OptionParser(version="%prog 0.01",description="Retrieve album information from SqueezeCenter and generate an XML file for processing via XSLT")
 
 parser.add_option("-s","--server",dest="server",help="SqueezeCenter host name or IP address",metavar="HOST",action="store",type="string",default="localhost")
 parser.add_option("-c","--cliport",dest="cliport",help="SqueezeCenter CLI port",metavar="PORT",action="store",type="int",default=9001)
