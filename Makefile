@@ -1,5 +1,7 @@
 VERSION=0.01
 
+slimxmlcat-$(VERSION).tar.gz: dist
+
 dist: .phony
 	svn update && \
 		mkdir -p slimxmlcat-$(VERSION) && \
