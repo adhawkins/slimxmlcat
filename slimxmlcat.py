@@ -4,7 +4,8 @@ import sys
 import time
 import codecs
 import optparse
-import xml.dom
+import libxml2
+import libxslt
 
 import SqueezeCenter.CLI.CLIComms
 
@@ -25,7 +26,7 @@ parser.add_option("-x","--xslt",dest="xsltfile",help="XSLT file name",metavar="F
 
 (options,args) = parser.parse_args()
 
-if options.file==None:
+if options.file==None or options.xsltfile==None:
 	parser.print_help()
 else:
 	slim=SqueezeCenter.CLI.CLIComms.CLIComms(options.server,int(options.cliport),progress)
@@ -35,8 +36,9 @@ else:
 
 		print "Found " + str(len(albums)) + " albums"
 
-		doc=xml.dom.getDOMImplementation().createDocument("","catalogue",None)
-		docelement=doc._get_documentElement()
+		doc=libxml2.newDoc("1.0")
+		root = libxml2.newNode("catalogue")
+		doc.setRootElement(root)
 
 		numdots=0
 		lastdots=0
@@ -53,89 +55,43 @@ else:
 			sys.stdout.flush()
 			lastdots=numdots
 
-			xmlalbum=doc.createElement("album");
-			xmlalbum.setAttribute("id",album.id())
-
-			name=doc.createElement("name")
-			nameval=doc.createTextNode(album.name())
-			name.appendChild(nameval)
-			xmlalbum.appendChild(name)
-
-			year=doc.createElement("year")
-			yearval=doc.createTextNode(str(album.year()))
-			year.appendChild(yearval)
-			xmlalbum.appendChild(year)
-
-			artwork=doc.createElement("artwork")
-			artworkval=doc.createTextNode("http://" + options.server + ":" + str(options.httpport) + "/music/" + str(album.artwork()) + "/cover.jpg")
-			artwork.appendChild(artworkval)
-			xmlalbum.appendChild(artwork)
-
-			disc=doc.createElement("disc")
-			discval=doc.createTextNode(str(album.disc()))
-			disc.appendChild(discval)
-			xmlalbum.appendChild(disc)
-
-			disccount=doc.createElement("disccount")
-			disccountval=doc.createTextNode(str(album.disccount()))
-			disccount.appendChild(disccountval)
-			xmlalbum.appendChild(disccount)
-
-			compilation=doc.createElement("compilation")
-			compilationval=doc.createTextNode(str(album.compilation()))
-			compilation.appendChild(compilationval)
-			xmlalbum.appendChild(compilation)
-
-			artist=doc.createElement("artist")
-			artistval=doc.createTextNode(album.artist())
-			artist.appendChild(artistval)
-			xmlalbum.appendChild(artist)
-
-			xmltracks=doc.createElement("tracks")
-
+			xmlalbum=root.newChild(None, "album", None)
+			xmlalbum.newProp("id",album.id())
+			
+			xmlalbum.newTextChild(None, "name", album.name())
+			xmlalbum.newTextChild(None, "year", str(album.year()))
+			xmlalbum.newTextChild(None, "artwork", "http://" + options.server + ":" + str(options.httpport) + "/music/" + str(album.artwork()) + "/cover.jpg")
+			xmlalbum.newTextChild(None, "disc", str(album.disc()))
+			xmlalbum.newTextChild(None, "disccount", str(album.disccount()))
+			xmlalbum.newTextChild(None, "compilation", str(album.compilation()))
+			xmlalbum.newTextChild(None, "artist", album.artist())
+			
+			xmltracks=xmlalbum.newChild(None, "tracks", None)
 			tracks=album.tracks()
 
 			for track in tracks:
-				xmltrack=doc.createElement("track")
+				xmltrack=xmltracks.newChild(None, "track", None)
+				
 				if track.discnum()!=0:
-					xmltrack.setAttribute("number",str(track.discnum()) + " - " + str(track.tracknum()))
+					xmltrack.newProp("number",str(track.discnum()) + " - " + str(track.tracknum()))
 				else:
-					xmltrack.setAttribute("number",str(track.tracknum()))
+					xmltrack.newProp("number",str(track.tracknum()))
 
-				title=doc.createElement("title")
-				titleval=doc.createTextNode(track.title())
-				title.appendChild(titleval)
-				xmltrack.appendChild(title)
+				xmltrack.newChild(None, "title", track.title().encode("UTF-8"))
+				xmltrack.newTextChild(None, "duration", str(track.duration()/60) + ":" + str(track.duration()%60).zfill(2))
+				xmltrack.newTextChild(None, "artist", track.artist())
+				xmltrack.newTextChild(None, "genre", track.genre())
 
-				duration=doc.createElement("duration")
-				durationval=doc.createTextNode(str(track.duration()/60) + ":" + str(track.duration()%60).zfill(2))
-				duration.appendChild(durationval)
-				xmltrack.appendChild(duration)
-
-				artist=doc.createElement("artist")
-				artistval=doc.createTextNode(track.artist())
-				artist.appendChild(artistval)
-				xmltrack.appendChild(artist)
-
-				genre=doc.createElement("genre")
-				genreval=doc.createTextNode(track.genre())
-				genre.appendChild(genreval)
-				xmltrack.appendChild(genre)
-
-				xmltracks.appendChild(xmltrack)
-
-			xmlalbum.appendChild(xmltracks)
-
-			docelement.appendChild(xmlalbum)
-
-
-		fp = codecs.open(str(options.file),"w","UTF-8")
+		doc.saveFormatFileEnc(options.file+".xml","UTF-8",1);
 
 		if options.xsltfile!=None:
-			fp.write("<?xml-stylesheet type=\"text/xsl\" href=\"" + str(options.xsltfile) + "\"?>")
-
-		doc.writexml(fp,"","","","UTF-8")
-
-
+			styledoc = libxml2.parseFile(options.xsltfile)
+			style = libxslt.parseStylesheetDoc(styledoc)
+			result = style.applyStylesheet(doc, None)
+			style.saveResultToFilename(options.file, result, 0)
+			style.freeStylesheet()
+			doc.freeDoc()
+			result.freeDoc()	
+	
 	except SqueezeCenter.CLI.CLIComms.CLICommsException, inst:
 		print "Exception: " + inst.message()
