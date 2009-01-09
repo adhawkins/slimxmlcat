@@ -58,13 +58,13 @@ else:
 			xmlalbum=root.newChild(None, "album", None)
 			xmlalbum.newProp("id",album.id())
 			
-			xmlalbum.newTextChild(None, "name", album.name())
+			xmlalbum.newTextChild(None, "name", album.name().encode("utf-8"))
 			xmlalbum.newTextChild(None, "year", str(album.year()))
 			xmlalbum.newTextChild(None, "artwork", "http://" + options.server + ":" + str(options.httpport) + "/music/" + str(album.artwork()) + "/cover.jpg")
 			xmlalbum.newTextChild(None, "disc", str(album.disc()))
 			xmlalbum.newTextChild(None, "disccount", str(album.disccount()))
 			xmlalbum.newTextChild(None, "compilation", str(album.compilation()))
-			xmlalbum.newTextChild(None, "artist", album.artist())
+			xmlalbum.newTextChild(None, "artist", album.artist().encode("utf-8"))
 			
 			xmltracks=xmlalbum.newChild(None, "tracks", None)
 			tracks=album.tracks()
@@ -77,12 +77,12 @@ else:
 				else:
 					xmltrack.newProp("number",str(track.tracknum()))
 
-				xmltrack.newChild(None, "title", track.title().encode("UTF-8"))
+				xmltrack.newChild(None, "title", track.title().encode("utf-8"))
 				xmltrack.newTextChild(None, "duration", str(track.duration()/60) + ":" + str(track.duration()%60).zfill(2))
-				xmltrack.newTextChild(None, "artist", track.artist())
-				xmltrack.newTextChild(None, "genre", track.genre())
+				xmltrack.newTextChild(None, "artist", track.artist().encode("utf-8"))
+				xmltrack.newTextChild(None, "genre", track.genre().encode("utf-8"))
 
-		doc.saveFormatFileEnc(options.file+".xml","UTF-8",1);
+		doc.saveFormatFileEnc(options.file+".xml","utf-8",1);
 
 		if options.xsltfile!=None:
 			styledoc = libxml2.parseFile(options.xsltfile)
