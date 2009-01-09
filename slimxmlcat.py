@@ -77,7 +77,7 @@ else:
 				else:
 					xmltrack.newProp("number",str(track.tracknum()))
 
-				xmltrack.newChild(None, "title", track.title().encode("utf-8"))
+				xmltrack.newTextChild(None, "title", track.title().encode("utf-8"))
 				xmltrack.newTextChild(None, "duration", str(track.duration()/60) + ":" + str(track.duration()%60).zfill(2))
 				xmltrack.newTextChild(None, "artist", track.artist().encode("utf-8"))
 				xmltrack.newTextChild(None, "genre", track.genre().encode("utf-8"))
