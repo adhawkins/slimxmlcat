@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:strip-space elements="*"/>
-	
+
 	<xsl:template match="/">
 	  <html>
+	  <head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		</head>
 	  <body>
 	    <h2>My CD Collection</h2>
 	    <table border="1">
@@ -17,7 +20,7 @@
 	  </body>
 	  </html>
 	</xsl:template>
-	
+
 	<xsl:template match="catalogue/album">
 		<tr>
 			<td><xsl:value-of select="name"/></td>
@@ -38,15 +41,15 @@
 					<xsl:apply-templates/>
 				</table>
 			</td>
-		</tr>		
+		</tr>
 	</xsl:template>
-	
+
 	<xsl:template match="track">
 		<tr>
 			<td><xsl:value-of select="@number"/></td>
 			<td><xsl:value-of select="title"/></td>
 			<td><xsl:value-of select="duration"/></td>
 			<td><xsl:value-of select="artist"/></td>
-		</tr>	
+		</tr>
 	</xsl:template>
 </xsl:stylesheet>
